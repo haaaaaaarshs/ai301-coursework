@@ -13,7 +13,7 @@ label is not graded.
 
 ## Posted upstream
 
-**GitHub username**
+**haaaaaaarshs**
 
 [Your GitHub username, exactly as it appears on your profile - no @, no
 profile URL. Your comment upstream is identified by this name, and it is
