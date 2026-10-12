@@ -127,7 +127,7 @@ The implementation branch will follow the repository naming convention, using:
 ```text
 fix/54-leading-whitespace-sections
 ```
-Before opening the PR, I will confirm that CI is green.
+After opening the PR, I will confirm all five CI jobs are green before requesting review.
 
 ## Risks and unknowns
 
@@ -137,4 +137,4 @@ The Markdown stripping path has a similar start-of-line assumption, so that beha
 
 ## Deviations
 
-The implementation followed the plan. The only minor deviation was formatting cleanup in `tests/unit/test_resume_parser.py`: Ruff removed whitespace from blank lines and Black reformatted the test file while running the repository checks. No change to the intended fix scope was required.
+The parser implementation follows the planned scope. During final review, the test coverage was expanded with parameterized cases for spaces, tabs, mixed indentation, unindented controls, Markdown headings, and ordinary body text that must not become a section header. These tests supplement the five existing issue-linked tests. The final diff does not include broad formatting cleanup.
