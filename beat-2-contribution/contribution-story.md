@@ -8,9 +8,8 @@ format criteria grade exactly that. Your course repo link is the whole submissio
 files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
-**Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
+**Student:** Harsh Sabu
+**GitHub Username:** haaaaaaarshs
 **Issue:** [GitHub issue link]
 **Pull Request:** [GitHub PR link, once opened]
 
@@ -55,10 +54,9 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: Building and refining my issue scout — October 18, 2026**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I upgraded my Unit 1 issue-select skill to issue-scout and wrote searches for Python API bugs, dataset issues, and C++ simulation bugs based on my backend, ML, and robotics interests. My first scan accepted one issue and rejected four, showing that unassigned issues can already have open PRs and that my rubric did not explicitly handle work already fixed by a merged PR. I updated the availability check, added a filter for the fixed-on-dev label, and clarified that a project using AI does not establish its policy on AI-assisted contributions. I also graded three picks from the course site, but the two accepted results still had concerns about an existing fix or work allocated to a bot, so I have not chosen a final issue.
 
 **Unit 6: [one line on the tool work]**
 
