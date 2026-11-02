@@ -1,4 +1,4 @@
-# Contribution: [Issue Title]
+# Contribution: Copter: vehicle may backup if mission with takeoff as first command is initiated
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -8,11 +8,10 @@ format criteria grade exactly that. Your course repo link is the whole submissio
 files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
-**Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
-**Issue:** [GitHub issue link]
-**Pull Request:** [GitHub PR link, once opened]
+**Student:** Harry Sabu
+**GitHub Username:** haaaaaaarshs
+**Issue:** https://github.com/ArduPilot/ardupilot/issues/6322
+**Pull Request:** Not opened yet.
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -66,10 +65,19 @@ or fell short, what changed because of it.]
 fell short, and what changed because of it. "Nothing broke" counts when
 it is true - say how you know.]
 
-**Unit 7: [one line on the tool work]**
+**Unit 7: Installed the ship-gate, wrote an ArduPilot gate manifest, and ran it on my branch (2026-10-30)**
 
-[2-4 sentences: the ship-gate and your gate manifest. What it produced
-on your real branch, what fought you, what changed because of it.]
+On October 30 I installed the staff ship-gate around my existing pr-precheck, changed its
+scope to real repositories, and wrote a sourced ArduPilot manifest with three checks:
+configure SITL, build Copter, and run the TakeoffAlt and TakeoffCheck autotests. The
+`gh pr create --help` canary was stopped by both voice-guard and ship-gate; Claude only
+showed ship-gate's stop at first, but matching 18:38 entries in both logs confirmed that both
+fired, so no bypass or settings repair was needed. The real manual run on
+`fix/6322-inflight-takeoff` against `master` passed all three checks and then stopped
+because the branch has no changes yet ("There is nothing to ship yet."), which is an
+empty-diff stop, not a passing verdict and not a rejection from my pr-precheck rubric. One
+improvement I would make is to check for an empty branch before spending over 20 minutes on
+builds and tests; this is a proposal, not something I have implemented.
 
 **Unit 8: [one line on the tool work]**
 
@@ -90,6 +98,9 @@ wild search and what you changed or would change, or what convinced
 you it held up. **Record the link to your claim comment in this section too.**
 Not claimed yet? Write `claim pending` and today's date where the link goes,
 and add the link the moment your claim lands.]
+
+- Claim comment: https://github.com/ArduPilot/ardupilot/issues/6322#issuecomment-6423029848
+- Progress update (posted October 30): https://github.com/ArduPilot/ardupilot/issues/6322#issuecomment-6534217165
 
 **Toolkit**
 
@@ -230,27 +241,41 @@ built, decisions you made when you made them, wrong turns included.]
 
 ## Pull Request
 
-**PR Link:** [GitHub PR URL when opened]
+**PR Link:** Not opened yet.
 
-**PR Description:** [what the PR says; much of the content above
-adapts into it]
+**PR Description:** Not written yet. No PR exists, and there is no fix to describe yet.
 
 **Maintainer Feedback:**
 
-- [Date]: [feedback received, or "none yet"; silence is a normal
-  state and costs you nothing]
-- [Date]: [how you addressed it]
+- None yet. No PR has been opened, so there is no PR feedback to record or address.
 
-**Status:** [Awaiting review / Iterating / Merged / Closed. The
-status is a fact you record, never a grade: the PR is graded as
-opened.]
+**Status:** Not opened. The branch `fix/6322-inflight-takeoff` has no changes against
+`master` yet.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: ship-gate, the staff gate that wraps my existing pr-precheck. I changed its scope to
+  real repositories and wrote a sourced ArduPilot manifest with three checks: configure SITL,
+  build Copter, and run the TakeoffAlt and TakeoffCheck autotests. Each command uses the
+  absolute Conda runner (`/opt/anaconda3/bin/conda run -n ardupilot-sitl ...`), so it selects
+  the required environment without manual activation. I ran the gate by hand on
+  `fix/6322-inflight-takeoff` against `master` on 2026-10-30.
+- What it produced: all three checks passed (configure 7s, Copter build 1073s, takeoff
+  autotests 212s), and then the gate stopped with: "the branch fix/6322-inflight-takeoff has
+  no changes against master ... There is nothing to ship yet." This was an empty-diff stop,
+  not a passing readiness verdict and not a rejection from my pr-precheck rubric. The existing
+  takeoff tests passing does not show that #6322 is fixed; I have not yet done a fix or an
+  issue-specific reproduction.
+- Difficulties: the `gh pr create --help` canary was blocked by both voice-guard and
+  ship-gate, but Claude at first showed only ship-gate's stop; the matching voice-guard and
+  ship-gate log entries (both 2026-10-30 18:38) confirmed both had fired. The manifest leaves
+  out ArduPilot's full Linux CI matrix, which I documented; that means reduced coverage, and
+  full CI has not been verified. The gate also spent over 20 minutes building and testing
+  before reporting that the branch was empty.
+- What changed: no bypass or settings repair was needed. My next work is reproducing the
+  issue, analyzing the cause, and writing a meaningful fix with a regression test. One
+  possible gate improvement is to detect an empty branch before running builds and tests;
+  this is a proposal, not an implemented change.
 
 ---
 
