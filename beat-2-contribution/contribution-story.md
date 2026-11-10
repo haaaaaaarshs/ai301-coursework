@@ -142,31 +142,49 @@ and add the link the moment your claim lands.]
 
 **Environment Setup**
 
-[What a stranger would need to stand this up: your operating system,
-the relevant versions (language, runtime, package manager, the project
-itself), and how you set the project up. Then the challenges you faced
-and how you solved them, or that none came up.]
+I cloned ArduPilot and its submodules on my Intel Mac and used the
+`ardupilot-sitl` Conda environment with Python 3.10.18. I configured
+and built Copter SITL at commit `72b238201f`. My disk filled during
+setup, so I removed old build artifacts and chose to remove the Windows
+virtual machine to free space. I then completed the build.
 
 **Steps to Reproduce**
 
-1. [Step 1]
-2. [Step 2]
-3. [Observed result]
+1. I started Copter SITL and MAVProxy, set `MIS_RESTART` to `1`, and
+   loaded a mission with a 50 m takeoff followed by a waypoint.
+2. I took off in GUIDED mode to 10 m, switched to LOITER, moved forward,
+   and then switched to AUTO while moving at approximately 4.5 m/s.
+3. I inspected the recorded position and velocity around the AUTO switch.
+
+The issue's original steps start the takeoff in Stabilize or Loiter.
+My initial GUIDED takeoff is a difference in this attempt.
 
 **Reproduction Evidence**
 
-- **Commit showing reproduction:** [link to commit in your fork]
-- **Screenshots/logs:** [if applicable]
-- **My findings:** [what you discovered during reproduction; an
-  honest, evidenced cannot-reproduce that led you to re-pick or ask
-  the maintainer belongs here and costs you nothing]
+- **Commit showing reproduction:** No reproduction commit yet. The
+  simulator reported baseline commit `72b238201f`.
+- **Screenshots/logs:** I saved the telemetry as
+  `~/ai301-backups/issue6322-flight-20261110-113517.tlog`.
+- **My findings:** In this one run, the copter slowed after switching
+  to AUTO and settled roughly 4.7 m north of the first recorded AUTO
+  position. It briefly moved south by approximately 0.25 m from its
+  furthest sampled position. I did not observe the substantial return
+  described in the issue. The AUTO time is approximate because it
+  comes from the first recorded heartbeat, and one run is not enough
+  to establish that the issue is fixed.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: ArduPilot SITL and MAVProxy for the simulated flight, and
+  `pymavlink` to inspect the saved telemetry.
+- What it produced: A flight log with position, velocity, altitude,
+  flight mode, and mission-item information.
+- Difficulties: The terminal snapshots were too far apart to show what
+  happened immediately after the AUTO switch. My initial takeoff also
+  used GUIDED rather than the mode specified in the issue.
+- What changed: I inspected the telemetry around the AUTO heartbeat.
+  I would repeat the attempt with the original takeoff steps and compare
+  the results before proposing a fix.
 
 ---
 
@@ -263,16 +281,14 @@ built, decisions you made when you made them, wrong turns included.]
   autotests 212s), and then the gate stopped with: "the branch fix/6322-inflight-takeoff has
   no changes against master ... There is nothing to ship yet." This was an empty-diff stop,
   not a passing readiness verdict and not a rejection from my pr-precheck rubric. The existing
-  takeoff tests passing does not show that #6322 is fixed; I have not yet done a fix or an
-  issue-specific reproduction.
+  takeoff tests passing does not show that #6322 is fixed; I have not made a fix. My first reproduction attempt did not show a substantial backup.
 - Difficulties: the `gh pr create --help` canary was blocked by both voice-guard and
   ship-gate, but Claude at first showed only ship-gate's stop; the matching voice-guard and
   ship-gate log entries (both 2026-10-30 18:38) confirmed both had fired. The manifest leaves
   out ArduPilot's full Linux CI matrix, which I documented; that means reduced coverage, and
   full CI has not been verified. The gate also spent over 20 minutes building and testing
   before reporting that the branch was empty.
-- What changed: no bypass or settings repair was needed. My next work is reproducing the
-  issue, analyzing the cause, and writing a meaningful fix with a regression test. One
+- What changed: no bypass or settings repair was needed. My next work is refining the reproduction, analyzing the cause, and writing a meaningful fix with a regression test. One
   possible gate improvement is to detect an empty branch before running builds and tests;
   this is a proposal, not an implemented change.
 
