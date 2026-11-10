@@ -193,6 +193,7 @@ My initial GUIDED takeoff is a difference in this attempt.
   described in the issue. The AUTO time is approximate because it
   comes from the first recorded heartbeat, and one run is not enough
   to establish that the issue is fixed.
+- I repeated the flight at commit 72b238201f, this time taking off in LOITER. I switched to Auto at about 21.5 m while moving north at roughly 4.5 m/s. In the telemetry samples, the copter slowed and settled about 10 m north of its position at the first recorded AUTO heartbeat. It briefly moved about 0.3 m south, but I did not see it return to that earlier position. My first attempt to center the forward control was received as 'rc', so I didn't center it until waypoint 2. I saved the flight log and would not treat this one attempt as proof that the issue is fixed.
 
 **Toolkit**
 
@@ -204,8 +205,8 @@ My initial GUIDED takeoff is a difference in this attempt.
   happened immediately after the AUTO switch. My initial takeoff also
   used GUIDED rather than the mode specified in the issue.
 - What changed: I inspected the telemetry around the AUTO heartbeat.
-  I would repeat the attempt with the original takeoff steps and compare
-  the results before proposing a fix.
+  I repeated the attempt with a LOITER takeoff and compared the results.
+  I haven't proposed a fix yet.
 
 ---
 
