@@ -80,10 +80,18 @@ empty-diff stop, not a passing verdict and not a rejection from my pr-precheck r
 improvement I would make is to check for an empty branch before spending over 20 minutes on
 builds and tests; this is a proposal, not something I have implemented.
 
-**Unit 8: [one line on the tool work]**
+**Unit 8: PR monitor and playbook — November 10, 2026**
 
-[2-4 sentences: the PR-monitor and your playbook. What it read, what it
-drafted, what you did with the draft.]
+I installed the PR monitor and ran its free state check on
+`fix/6322-inflight-takeoff`. It reported `NO PR YET`, so there was no PR
+activity to read or move to draft, and the state check made no Claude
+call. I examined five recently merged ArduPilot PRs and wrote a playbook
+with follow-up checkpoints around days 10 and 24 and a decision about
+closing after about a month if the PR remains unanswered. The monitor's
+staff nudge form calls for one polite surfacing, so it may not draft the
+second follow-up I want. I updated my voice guide to allow two and would
+write and check a second follow-up myself; the state check now reports
+all four playbook sections filled.
 
 ---
 
