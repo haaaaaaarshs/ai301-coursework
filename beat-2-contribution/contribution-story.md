@@ -58,11 +58,13 @@ one in the week it belongs to.
 
 I upgraded my Unit 1 issue-select skill to issue-scout and wrote searches for Python API bugs, dataset issues, and C++ simulation bugs based on my backend, ML, and robotics interests. My first scan accepted one issue and rejected four, showing that unassigned issues can already have open PRs and that my rubric did not explicitly handle work already fixed by a merged PR. I updated the availability check, added a filter for the fixed-on-dev label, and clarified that a project using AI does not establish its policy on AI-assisted contributions. I also graded three picks from the course site, but the two accepted results still had concerns about an existing fix or work allocated to a bot, so I have not chosen a final issue.
 
-**Unit 6: [one line on the tool work]**
+**Unit 6: Voice guard and repository memory — updated October 30, 2026**
 
-[2-4 sentences: the voice-guard, the repo-memory file. What broke or
-fell short, and what changed because of it. "Nothing broke" counts when
-it is true - say how you know.]
+I installed a voice guard to check my GitHub drafts against my voice
+guide. It passed my progress-update draft, but another review caught a
+typo that the guard missed, so I corrected the typo before posting.
+When I later found that my ArduPilot `CLAUDE.local.md` was missing, I
+created one using the repository's instructions and build commands.
 
 **Unit 7: Installed the ship-gate, wrote an ArduPilot gate manifest, and ran it on my branch (2026-10-30)**
 
@@ -87,27 +89,25 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
-[1-2 paragraphs in your own words: how you searched, what your scan
-surfaced, what your scout's verdict said, why this issue fits your
-profile, and what you hope to learn. If your scout's verdict on it
-was reject and you chose it anyway, say so here and say why; choosing
-against your own tool silently is what loses points. Close with an
-honest read of the tool itself: where the scout fell short on a real
-wild search and what you changed or would change, or what convinced
-you it held up. **Record the link to your claim comment in this section too.**
-Not claimed yet? Write `claim pending` and today's date where the link goes,
-and add the link the moment your claim lands.]
+I searched for issues that fit my interests in backend development,
+machine learning, and robotics. I chose ArduPilot #6322 because it gave me a chance to learn about C++
+and flight simulation while working on a real open-source issue. The
+issue had a simulator procedure, which gave me a place to start.
+
+My scout needed refinement during the search. An unassigned issue
+could still have an open PR, and a project using AI did not necessarily
+mean it allowed AI-assisted contributions. I updated my checks to
+account for those distinctions.
 
 - Claim comment: https://github.com/ArduPilot/ardupilot/issues/6322#issuecomment-6423029848
-- Progress update (posted October 30): https://github.com/ArduPilot/ardupilot/issues/6322#issuecomment-6534217165
+- Progress update: https://github.com/ArduPilot/ardupilot/issues/6322#issuecomment-6534217165
 
 **Toolkit**
 
-- Tool: issue-scout (your scout: your search strategy, your rubric),
-  and how you used it
-- What it produced: [the scan and its verdict on this issue, described]
-- Difficulties: [where it fell short, or "none met" if none did]
-- What changed: [what you patched or would update, or "nothing"]
+- Tool: issue-scout, using my search strategy and rubric.
+- What it produced: candidate issues to investigate, including ArduPilot #6322.
+- Difficulties: availability and AI-use rules needed closer checks.
+- What changed: I refined the availability and AI-policy checks.
 
 ---
 
@@ -115,26 +115,39 @@ and add the link the moment your claim lands.]
 
 **Problem Description**
 
-[In your own words, what is broken or missing?]
+The report describes a copter moving forward when an AUTO mission begins
+with a takeoff command. It may slow down and return toward the position
+where the command started.
 
 **Expected Behavior**
 
-[What should happen?]
+The proposed behavior in the issue is for an already-airborne copter
+to use its horizontal stopping point as the target. I asked the
+maintainer whether that is still the intended behavior.
 
 **Current Behavior**
 
-[What actually happens?]
+The issue reports a return toward the initial position. In my first
+simulator attempt, the copter slowed and stopped ahead of the first
+recorded AUTO position, with a small backward movement. That one run
+does not establish the behavior in every case.
 
 **Affected Components**
 
-[Which parts of the codebase are involved?]
+I traced the AUTO takeoff path through `ArduCopter/mode_auto.cpp` and
+the shared takeoff code in `ArduCopter/takeoff.cpp`. The latter is also
+used by GUIDED mode, so its callers matter when considering changes.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: the issue report, repository source, and ChatGPT to help me
+  trace the takeoff path.
+- What it produced: a description of the reported behavior and the
+  functions involved in starting and running a takeoff.
+- Difficulties: reading the code alone did not establish whether the
+  old report still reproduces on the tested revision.
+- What changed: I ran a simulator attempt and inspected telemetry
+  before proposing a code change.
 
 ---
 
@@ -192,67 +205,84 @@ My initial GUIDED takeoff is a difference in this attempt.
 
 **Analysis**
 
-[Your analysis of the root cause: what is causing the issue, traced
-to the files and functions involved.]
+The issue attributes the reported behavior to the horizontal target
+chosen when an airborne AUTO takeoff starts. In the tested code,
+`ModeAuto::takeoff_start` calls `auto_takeoff.start_m`, and the shared
+takeoff run code sends a zero horizontal-velocity request once
+navigation is active. I have not confirmed a current root cause.
 
 **Proposed Solution**
 
-[High-level description of your fix approach, and what you are
-deliberately NOT changing.]
+I have not proposed a code fix yet. I would first repeat the simulator
+attempt using the original takeoff steps, compare the telemetry, and
+ask for maintainer guidance if the intended behavior remains unclear.
 
 **Implementation Plan**
 
-1. [Modify file X to do Y]
-2. [Add or change Z]
-3. [Update tests]
-
-[Record deviations here as they happen: what changed mid-build and
-why. A recorded deviation is honest work; silent drift is not.]
+1. Repeat the scenario with takeoff in Stabilize or Loiter.
+2. Measure horizontal position and velocity around the AUTO switch.
+3. If the issue reproduces, develop a focused fix and regression test
+   after understanding the affected controller behavior.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: repository source, SITL, and telemetry analysis.
+- What it produced: a trace of the takeoff path and a first flight result.
+- Difficulties: my first attempt differed from the original procedure,
+  and the maintainer has not answered my expected-behavior question.
+- What changed: I will refine the reproduction before choosing a fix.
 
 ---
 
 ## Testing Strategy
 
-[What observable checks prove the fix: your reproduction steps re-run
-against the built change (before and after), and the repo's own test
-suite or checks with the outcome shown. "Tests pass" with nothing
-observable named is not a strategy.]
+On the baseline, I configured and built Copter SITL and ran the
+`TakeoffAlt` and `TakeoffCheck` autotests. Both passed with exit
+status 0. These checks do not measure the reported horizontal backup.
+
+For an issue-specific check, I ran a mission with `MIS_RESTART=1` and
+examined position and velocity around the AUTO transition. The first
+attempt did not show a substantial return to the starting position.
+I would repeat the original procedure and compare before-and-after
+telemetry if a fix becomes appropriate. The full Linux CI matrix has
+not been verified locally.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: the sourced ship manifest, Copter autotests, SITL, and pymavlink.
+- What it produced: a passing build and two passing existing tests,
+  plus telemetry from one issue-specific attempt.
+- Difficulties: the existing tests do not check the reported backup,
+  and the full Linux CI matrix was outside my local gate.
+- What changed: I added an observable position-and-velocity check to
+  my investigation and recorded its limits.
 
 ---
 
 ## Implementation Notes
 
-[A running log, added to as you work. Date each entry. What you
-built, decisions you made when you made them, wrong turns included.]
+**2026-10-30**
 
-**[Date]**
+I resolved a disk-space blocker, built Copter SITL, and ran the two
+existing takeoff autotests. I installed the ship-gate and wrote the
+manifest. Its real-branch run passed the repository checks and stopped
+because my branch had no changes.
 
-[Entry]
+**2026-11-10**
 
-**[Date]**
-
-[Entry]
+I ran my first issue-specific simulator attempt and inspected the
+telemetry. It did not show the substantial return described in the
+report. My initial takeoff used GUIDED, so I recorded that difference.
+I have not implemented a fix.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: ship-gate, SITL, MAVProxy, and pymavlink.
+- What it produced: a gate report, baseline test results, and a flight log.
+- Difficulties: storage filled during setup, and the initial terminal
+  readings were too far apart to inspect the AUTO transition.
+- What changed: I freed space and used the saved telemetry for closer
+  inspection.
 
 ---
 
@@ -298,25 +328,26 @@ built, decisions you made when you made them, wrong turns included.]
 
 **Technical Skills Gained**
 
-[What you learned technically, named concretely.]
+I learned to configure and build Copter SITL, load a mission in
+MAVProxy, and inspect position and velocity in a telemetry log.
 
 **Challenges Overcome**
 
-[What was hard and how you solved it; point at the real events, the
-Toolkit blocks above are full of them.]
+My disk filled during setup. I freed space and completed the build.
+When the terminal readings were too far apart to show the AUTO
+transition, I examined the saved log instead.
 
 **What I'd Do Differently Next Time**
 
-[Reflection on your process.]
+I would check available storage earlier and plan how to capture
+measurements before starting the simulation. I would also make the
+gate check for an empty branch before running expensive checks.
 
 ---
 
 ## Resources Used
 
-[What actually helped, not a reading list. List things this story
-already shows you using: the doc you followed to set the environment
-up, the thread that explained the bug, the person who answered you.
-One real entry beats ten plausible ones.]
-
-- [Link to documentation that helped]
-- [Discussion, issue, or post that helped]
+- ArduPilot issue #6322 and its simulator steps:
+  https://github.com/ArduPilot/ardupilot/issues/6322
+- ArduPilot build instructions in the tested repository:
+  https://github.com/ArduPilot/ardupilot/blob/72b238201f/BUILD.md
