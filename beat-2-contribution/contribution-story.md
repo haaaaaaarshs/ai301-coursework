@@ -140,6 +140,10 @@ simulator attempt, the copter slowed and stopped ahead of the first
 recorded AUTO position, with a small backward movement. That one run
 does not establish the behavior in every case.
 
+I repeated the attempt at `72b238201f` with a LOITER takeoff and again
+did not observe a substantial return. I centered the forward control
+late in that run.
+
 **Affected Components**
 
 I traced the AUTO takeoff path through `ArduCopter/mode_auto.cpp` and
@@ -215,31 +219,39 @@ My initial GUIDED takeoff is a difference in this attempt.
 **Analysis**
 
 The issue attributes the reported behavior to the horizontal target
-chosen when an airborne AUTO takeoff starts. In the tested code,
+chosen when an airborne AUTO takeoff starts. In the `72b238201f` source I inspected,
 `ModeAuto::takeoff_start` calls `auto_takeoff.start_m`, and the shared
 takeoff run code sends a zero horizontal-velocity request once
 navigation is active. I have not confirmed a current root cause.
 
 **Proposed Solution**
 
-I have not proposed a code fix yet. I would first repeat the simulator
-attempt using the original takeoff steps, compare the telemetry, and
-ask for maintainer guidance if the intended behavior remains unclear.
+I have not proposed a code fix yet. I repeated the simulator attempt
+with a LOITER takeoff, compared the telemetry, and added an automated
+check of the airborne AUTO transition. I previously asked the maintainer
+whether the horizontal stopping point is still the intended target.
 
 **Implementation Plan**
 
-1. Repeat the scenario with takeoff in Stabilize or Loiter.
-2. Measure horizontal position and velocity around the AUTO switch.
-3. If the issue reproduces, develop a focused fix and regression test
-   after understanding the affected controller behavior.
+1. Repeat the scenario with a LOITER takeoff and inspect the telemetry.
+   Done at `72b238201f`.
+2. Add a focused automated test for the airborne AUTO transition.
+   Done locally on checkout `2d714bba28`.
+3. Investigate the two timeouts in the broader test group and consider
+   whether the test is suitable as a standalone contribution.
+4. If the reported behavior is reproduced, analyze the controller and
+   consider a focused fix with before-and-after evidence.
 
 **Toolkit**
 
 - Tool: repository source, SITL, and telemetry analysis.
-- What it produced: a trace of the takeoff path and a first flight result.
+- What it produced: a trace of the takeoff path, two manual flights,
+  and a passing focused test.
 - Difficulties: my first attempt differed from the original procedure,
-  and the maintainer has not answered my expected-behavior question.
-- What changed: I will refine the reproduction before choosing a fix.
+  and the maintainer had not answered my expected-behavior question when
+  I last checked. The broader test group also had two message timeouts.
+- What changed: I repeated the flight in LOITER and added a local
+  automated test. I have not proposed a controller fix.
 
 ---
 
