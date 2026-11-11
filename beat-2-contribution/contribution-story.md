@@ -284,6 +284,9 @@ telemetry. It did not show the substantial return described in the
 report. My initial takeoff used GUIDED, so I recorded that difference.
 I have not implemented a fix.
 
+I later repeated the flight with a LOITER takeoff and again did not observe a substantial return. On the newer checkout at `2d714bba28`, I added the `AutoTakeoffWhileMoving` test. In a focused run, it passed and measured a maximum return of 0.38 m. That result does not establish that the issue is fixed.
+
+The first automated run failed because the simulated copter landed too far from the startup location. I changed the test to return home, and the focused test then passed. I also ran `test.CopterTests1d`, which failed when `FETtecESC` and `CircleManualControlEntryLeft` timed out waiting for messages. I am still looking into the cause.
 **Toolkit**
 
 - Tool: ship-gate, SITL, MAVProxy, and pymavlink.
