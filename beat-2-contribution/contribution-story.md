@@ -252,6 +252,18 @@ status 0. These checks do not measure the reported horizontal backup.
 For an issue-specific check, I ran a mission with `MIS_RESTART=1` and
 examined position and velocity around the AUTO transition. The first
 attempt did not show a substantial return to the starting position.
+
+I repeated the flight with a LOITER takeoff and again did not observe a
+substantial return. On checkout `2d714bba28`, I added
+`AutoTakeoffWhileMoving` to check movement when an airborne copter
+switches to AUTO. An early run measured 0.38 m of return but failed the
+startup location check after landing. After I changed the test to
+return home, a focused run passed with exit status 0. A later focused
+run also passed after checks on the recorded samples were added.
+
+The broader `test.CopterTests1d` run failed when `FETtecESC` and
+`CircleManualControlEntryLeft` timed out waiting for messages. The cause
+is still unknown. These results do not establish that #6322 is fixed.
 I would repeat the original procedure and compare before-and-after
 telemetry if a fix becomes appropriate. The full Linux CI matrix has
 not been verified locally.
@@ -260,11 +272,14 @@ not been verified locally.
 
 - Tool: the sourced ship manifest, Copter autotests, SITL, and pymavlink.
 - What it produced: a passing build and two passing existing tests,
-  plus telemetry from one issue-specific attempt.
+  plus telemetry from two simulator attempts and a passing focused test.
+  The broader Copter group failed with two timeouts.
 - Difficulties: the existing tests do not check the reported backup,
-  and the full Linux CI matrix was outside my local gate.
+  and the full Linux CI matrix was outside my local gate. Two other tests
+  timed out during the broader run, and I have not found the cause.
 - What changed: I added an observable position-and-velocity check to
-  my investigation and recorded its limits.
+  my investigation and added an automated test. I changed the test to
+  return home after its first run failed the startup location check.
 
 ---
 
