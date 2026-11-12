@@ -11,7 +11,7 @@ files and no evidence uploads are part of Assignment 5.
 **Student:** Harsh Sabu
 **GitHub Username:** haaaaaaarshs
 **Issue:** https://github.com/ArduPilot/ardupilot/issues/6322
-**Pull Request:** Not opened yet.
+**Pull Request:** https://github.com/ArduPilot/ardupilot/pull/35129
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -236,9 +236,9 @@ whether the horizontal stopping point is still the intended target.
 1. Repeat the scenario with a LOITER takeoff and inspect the telemetry.
    Done at `72b238201f`.
 2. Add a focused automated test for the airborne AUTO transition.
-   Done locally on checkout `2d714bba28`.
-3. Investigate the two timeouts in the broader test group and consider
-   whether the test is suitable as a standalone contribution.
+   Added on `2d714bba28`; rebased and opened as test-only PR #35129.
+3. Monitor the PR and respond to maintainer feedback. The local timeouts
+   remain unexplained; GitHub's `tests1d` group later passed.
 4. If the reported behavior is reproduced, analyze the controller and
    consider a focused fix with before-and-after evidence.
 
@@ -246,12 +246,13 @@ whether the horizontal stopping point is still the intended target.
 
 - Tool: repository source, SITL, and telemetry analysis.
 - What it produced: a trace of the takeoff path, two manual flights,
-  and a passing focused test.
+  a passing focused test, and a test-only PR.
 - Difficulties: my first attempt differed from the original procedure,
   and the maintainer had not answered my expected-behavior question when
-  I last checked. The broader test group also had two message timeouts.
-- What changed: I repeated the flight in LOITER and added a local
-  automated test. I have not proposed a controller fix.
+  I last checked. The local broader test group had two message timeouts; GitHub's
+  `tests1d` group later passed.
+- What changed: I repeated the flight in LOITER, added an automated
+  test, and opened a test-only PR. I have not proposed a controller fix.
 
 ---
 
@@ -273,19 +274,29 @@ startup location check after landing. After I changed the test to
 return home, a focused run passed with exit status 0. A later focused
 run also passed after checks on the recorded samples were added.
 
-The broader `test.CopterTests1d` run failed when `FETtecESC` and
+A local `test.CopterTests1d` run failed when `FETtecESC` and
 `CircleManualControlEntryLeft` timed out waiting for messages. The cause
 is still unknown. These results do not establish that #6322 is fixed.
 I would repeat the original procedure and compare before-and-after
 telemetry if a fix becomes appropriate. The full Linux CI matrix has
 not been verified locally.
 
+After rebasing onto `546cf152a8`, I ran flake8, the Copter build,
+`TakeoffAlt`, `TakeoffCheck`, and `AutoTakeoffWhileMoving` on commit
+`ce01d4c7c3`; they passed. The moving-takeoff test recorded 18.7 seconds
+of samples, a maximum gap of 50 ms, and 0.38 m of return.
+
+On November 12, GitHub reported 55 passing checks on PR #35129,
+including the Copter `tests1d` group. The earlier local timeouts remain
+unexplained; the CI result does not identify their cause.
+
 **Toolkit**
 
 - Tool: the sourced ship manifest, Copter autotests, SITL, and pymavlink.
 - What it produced: a passing build and two passing existing tests,
   plus telemetry from two simulator attempts and a passing focused test.
-  The broader Copter group failed with two timeouts.
+  The local broader Copter group failed with two timeouts; GitHub's
+  Copter `tests1d` group later passed.
 - Difficulties: the existing tests do not check the reported backup,
   and the full Linux CI matrix was outside my local gate. Two other tests
   timed out during the broader run, and I have not found the cause.
@@ -314,6 +325,18 @@ I have not implemented a fix.
 I later repeated the flight with a LOITER takeoff and again did not observe a substantial return. On the newer checkout at `2d714bba28`, I added the `AutoTakeoffWhileMoving` test. In a focused run, it passed and measured a maximum return of 0.38 m. That result does not establish that the issue is fixed.
 
 The first automated run failed because the simulated copter landed too far from the startup location. I changed the test to return home, and the focused test then passed. I also ran `test.CopterTests1d`, which failed when `FETtecESC` and `CircleManualControlEntryLeft` timed out waiting for messages. I am still looking into the cause.
+
+**2026-11-11**
+
+After rebasing my test-only branch, I ran ship-gate. Its manifest checks
+and updated precheck passed, and I opened PR #35129.
+
+**2026-11-12**
+
+GitHub reported 55 passing checks. My PR monitor initially couldn't find
+the open PR; after I set my local branch to track my fork's branch, its
+state-only run found the PR without a Claude call.
+
 **Toolkit**
 
 - Tool: ship-gate, SITL, MAVProxy, and pymavlink.
@@ -327,16 +350,19 @@ The first automated run failed because the simulated copter landed too far from 
 
 ## Pull Request
 
-**PR Link:** Not opened yet.
+**PR Link:** https://github.com/ArduPilot/ardupilot/pull/35129
 
-**PR Description:** Not written yet. No PR exists, and there is no fix to describe yet.
+**PR Description:** A test-only check of an airborne AUTO takeoff. It
+measures how far the copter moves back along its initial direction, with
+a provisional 1.5 m limit. It does not claim that #6322 is fixed.
 
 **Maintainer Feedback:**
 
-- None yet. No PR has been opened, so there is no PR feedback to record or address.
+- None as of November 12; the monitor reported no comments or reviews.
 
-**Status:** Not opened. The branch `fix/6322-inflight-takeoff` has no changes against
-`master` yet.
+**Status:** Open and not a draft as of November 12. GitHub reported 55
+passing checks; the monitor reported review required and mergeability
+`UNKNOWN`.
 
 **Toolkit**
 
@@ -353,13 +379,20 @@ The first automated run failed because the simulated copter landed too far from 
   takeoff tests passing does not show that #6322 is fixed; I have not made a fix. My first reproduction attempt did not show a substantial backup.
 - Difficulties: the `gh pr create --help` canary was blocked by both voice-guard and
   ship-gate, but Claude at first showed only ship-gate's stop; the matching voice-guard and
-  ship-gate log entries (both 2026-10-30 18:38) confirmed both had fired. The manifest leaves
-  out ArduPilot's full Linux CI matrix, which I documented; that means reduced coverage, and
-  full CI has not been verified. The gate also spent over 20 minutes building and testing
-  before reporting that the branch was empty.
-- What changed: no bypass or settings repair was needed. My next work is refining the reproduction, analyzing the cause, and writing a meaningful fix with a regression test. One
-  possible gate improvement is to detect an empty branch before running builds and tests;
-  this is a proposal, not an implemented change.
+  ship-gate log entries (both 2026-10-30 18:38) confirmed both had fired.
+  The manifest left out the full Linux CI matrix, so the local gate had
+  reduced coverage. I haven't run the full Linux matrix locally. GitHub
+  later reported 55 passing checks, including Copter `tests1d`. The gate
+  also spent over 20 minutes building and testing before reporting that
+  the branch was empty.
+- What changed: I added `AutoTakeoffWhileMoving` to the manifest and
+  updated my pr-precheck for test-only contributions to consider the
+  test, commit, command, output, and limits. Fixes still require
+  before-and-after evidence. I also changed it to mark the issue thread
+  unclear if it cannot be fetched. The gate then passed and I opened
+  the test-only PR. After I set the local branch to track my fork, a free
+  PR-monitor `--state` run found it. Detecting an empty branch before
+  builds and tests remains a proposal, not an implemented change.
 
 ---
 
