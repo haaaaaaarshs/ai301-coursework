@@ -339,13 +339,10 @@ state-only run found the PR without a Claude call.
 
 **Toolkit**
 
-- Tool: ship-gate, SITL, MAVProxy, and pymavlink.
-- What it produced: a gate report, baseline test results, and a flight log.
-- Difficulties: storage filled during setup, and the initial terminal
-  readings were too far apart to inspect the AUTO transition.
-- What changed: I freed space and used the saved telemetry for closer
-  inspection.
-
+- Tool: Ship Gate, ArduPilot SITL, MAVProxy, pymavlink, Copter autotests, and PR Monitor.
+- What it produced: Simulator telemetry, the `AutoTakeoffWhileMoving` automated test, passing focused tests, and test-only PR #35129.
+- Difficulties: Disk-space limitations, insufficient initial telemetry sampling, unexplained timeouts in a broader test run, and failure to reproduce the substantial reported backward movement.
+- What changed: I repeated the flight in LOITER, added the automated test, rebased the branch, and revised the test following maintainer feedback. The revised run measured a maximum return of 0.57 m. I have not implemented a flight-controller fix.
 ---
 
 ## Pull Request
