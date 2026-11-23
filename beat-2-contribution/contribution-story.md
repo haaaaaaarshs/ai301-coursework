@@ -352,48 +352,22 @@ state-only run found the PR without a Claude call.
 
 **PR Link:** https://github.com/ArduPilot/ardupilot/pull/35129
 
-**PR Description:** A test-only check of an airborne AUTO takeoff. It
-measures how far the copter moves back along its initial direction, with
-a provisional 1.5 m limit. It does not claim that #6322 is fixed.
+**PR Description:** A test-only check of an airborne AUTO takeoff. It measures how far the copter moves backward along its initial direction of travel, using a provisional 1.5 m tolerance. This threshold serves as an initial testing boundary rather than a validated safety limit. It allows for small positional changes while identifying larger backward movements, but it may need adjustment based on further testing and maintainer feedback. The test does not claim that issue #6322 is fixed.
 
 **Maintainer Feedback:**
 
-- None as of November 12; the monitor reported no comments or reviews.
+After opening PR #35129, Peter Barker suggested testing at a higher forward speed to investigate whether the reported behavior could be reproduced. He also recommended simplifying unnecessary delays and cleanup steps. I revised the test to reach a higher initial speed, removed unnecessary code, and simplified the cleanup. I also clarified the purpose of the automated test in response to another maintainer's question.
 
-**Status:** Open and not a draft as of November 12. GitHub reported 55
-passing checks; the monitor reported review required and mergeability
-`UNKNOWN`.
+**Status:**
+
+PR #35129 remains open and under review as of November 22, 2026. The latest documented local run of the revised test recorded an initial horizontal speed of 10.17 m/s, 18.7 seconds of AUTO position samples, a maximum sample gap of 50 ms, and a maximum return of 0.57 m. The selected focused autotests and Flake8 passed. The substantial return originally reported in issue #6322 has not been reproduced, and the PR does not claim to fix the underlying issue.
 
 **Toolkit**
 
-- Tool: ship-gate, the staff gate that wraps my existing pr-precheck. I changed its scope to
-  real repositories and wrote a sourced ArduPilot manifest with three checks: configure SITL,
-  build Copter, and run the TakeoffAlt and TakeoffCheck autotests. Each command uses the
-  absolute Conda runner (`/opt/anaconda3/bin/conda run -n ardupilot-sitl ...`), so it selects
-  the required environment without manual activation. I ran the gate by hand on
-  `fix/6322-inflight-takeoff` against `master` on 2026-10-30.
-- What it produced: all three checks passed (configure 7s, Copter build 1073s, takeoff
-  autotests 212s), and then the gate stopped with: "the branch fix/6322-inflight-takeoff has
-  no changes against master ... There is nothing to ship yet." This was an empty-diff stop,
-  not a passing readiness verdict and not a rejection from my pr-precheck rubric. The existing
-  takeoff tests passing does not show that #6322 is fixed; I have not made a fix. My first reproduction attempt did not show a substantial backup.
-- Difficulties: the `gh pr create --help` canary was blocked by both voice-guard and
-  ship-gate, but Claude at first showed only ship-gate's stop; the matching voice-guard and
-  ship-gate log entries (both 2026-10-30 18:38) confirmed both had fired.
-  The manifest left out the full Linux CI matrix, so the local gate had
-  reduced coverage. I haven't run the full Linux matrix locally. GitHub
-  later reported 55 passing checks, including Copter `tests1d`. The gate
-  also spent over 20 minutes building and testing before reporting that
-  the branch was empty.
-- What changed: I added `AutoTakeoffWhileMoving` to the manifest and
-  updated my pr-precheck for test-only contributions to consider the
-  test, commit, command, output, and limits. Fixes still require
-  before-and-after evidence. I also changed it to mark the issue thread
-  unclear if it cannot be fetched. The gate then passed and I opened
-  the test-only PR. After I set the local branch to track my fork, a free
-  PR-monitor `--state` run found it. Detecting an empty branch before
-  builds and tests remains a proposal, not an implemented change.
-
+- Tool: Ship Gate, ArduPilot SITL, MAVProxy, pymavlink, Copter autotests, and PR Monitor.
+- What it produced: Simulator telemetry, the `AutoTakeoffWhileMoving` automated test, passing focused test results, and the test-only pull request #35129.
+- Difficulties: Disk-space limitations, insufficient initial telemetry sampling, unexplained timeouts in a broader test run, and the inability to reproduce the substantial backward movement originally reported.
+- What changed: I repeated the flight in LOITER, added an automated test, rebased the branch, and revised the test following maintainer feedback. I also increased the test's initial speed and simplified its cleanup. The revised local run measured 0.57 m of maximum return. I have not implemented a flight-controller fix.
 ---
 
 ## Learnings and Reflections
